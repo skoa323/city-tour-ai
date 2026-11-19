@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>「源」— のんべい横丁</title>
+<style>
+  :root{--ink:#0e0b09;--wood:#2a1a12;--red:#c0392b;--paper:#e8dcc8;--warm:#e0a55c}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:-apple-system,"Hiragino Sans","PingFang SC",sans-serif;font-size:14px}
+  .wrap{max-width:520px;margin:0 auto;padding:14px}
+  /* 巷子 */
+  .alley{position:relative;height:210px;border-radius:12px;overflow:hidden;
+    background:linear-gradient(180deg,#120d0a 0%,#1d1410 55%,#0a0706 100%)}
+  .alley:before,.alley:after{content:"";position:absolute;top:0;bottom:0;width:34%;
+    background:repeating-linear-gradient(90deg,#241710 0 16px,#1b100b 16px 19px);opacity:.9}
+  .alley:before{left:0;clip-path:polygon(0 0,100% 12%,100% 88%,0 100%)}
+  .alley:after{right:0;clip-path:polygon(100% 0,0 12%,0 88%,100% 100%)}
+  .lantern{position:absolute;left:44%;top:18px;width:44px;height:60px;border-radius:22px/26px;
+    background:radial-gradient(circle at 45% 35%,#ff8b5e,#c0392b 60%,#6e1b12);
+    box-shadow:0 0 40px 14px rgba(220,80,40,.35);animation:flick 4s infinite ease-in-out}
+  .lantern span{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;color:#2a0d08;font-weight:700}
+  @keyframes flick{0%,100%{opacity:1}48%{opacity:.86}52%{opacity:.97}}
+  .counter{position:absolute;left:36%;right:36%;bottom:0;height:56px;background:linear-gradient(180deg,#3a2418,#1a0f09);
+    border-top:2px solid #4b2f1e}
+  .shadow{position:absolute;left:46%;bottom:52px;width:30px;height:78px;border-radius:14px 14px 4px 4px;
+    background:linear-gradient(180deg,#0b0806,#14100c);opacity:.95}
+  .shadow:after{content:"";position:absolute;top:-17px;left:7px;width:17px;height:17px;border-radius:50%;background:#0b0806}
+  .sign{position:absolute;left:8px;top:8px;font-size:10px;color:#8a7566;letter-spacing:.12em;writing-mode:vertical-rl}
+  /* 卡片 */
+  .card{margin-top:12px;background:linear-gradient(180deg,#191310,#120e0b);border:1px solid #2e211a;border-radius:12px;padding:12px}
+  h1{margin:0;font-size:17px;letter-spacing:.04em}
+  .sub{color:#8a7566;font-size:11px;margin-top:3px;line-height:1.5}
+  .meter{height:6px;background:#241a14;border-radius:3px;overflow:hidden;margin-top:10px}
+  .meter i{display:block;height:100%;width:32%;background:linear-gradient(90deg,#7a5a3a,var(--warm));transition:.4s}
+  .row{display:flex;justify-content:space-between;font-size:11px;color:#9a8172;margin-top:6px}
+  #log{margin-top:12px;min-height:130px;max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+  .m{max-width:88%;padding:8px 10px;border-radius:10px;line-height:1.6;font-size:13px;white-space:pre-wrap}
+  .them{background:#1f1712;border:1px solid #33241b;align-self:flex-start}
+  .me{background:#241c2e;color:#d8cbe8;align-self:flex-end}
+  .tag{font-size:10px;color:#6f5b4d;margin-top:3px}
+  .btns{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  button{background:#1e1611;color:#d9c7b3;border:1px solid #3a2a1f;border-radius:8px;padding:8px 11px;font-size:12px;font-family:inherit}
+  button:active{background:#2c2018}
+  button.hot{border-color:#5a2a22;color:#e8b4a8}
+  .fine{color:#6f5b4d;font-size:10px;margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="alley">
+    <div class="sign">渋谷 のんべい横丁</div>
+    <div class="lantern"><span>源</span></div>
+    <div class="counter"></div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="card">
+    <h1>野村 源次 / 野村源次</h1>
+    <div class="sub">68 岁 ·「源」店主 · 六席 · 18:00–02:00（周一休）<br>
+      165cm，驼背，左眉一道旧疤；不想回答的时候一直在擦杯子。</div>
+    <div class="meter"><i id="bar"></i></div>
+    <div class="row"><span id="band">平</span><span id="val">respect 32</span></div>
+  </div>
+
+  <div id="log"></div>
+
+  <div class="btns">
+    <button onclick="act('こんばんは')">打招呼</button>
+    <button onclick="act('熱燗お願いします')">点热酒</button>
+    <button onclick="act('この店、いいですね')">夸他的店</button>
+    <button class="hot" onclick="act('この路地、取り壊されるって本当？')">问拆迁</button>
+    <button class="hot" onclick="act('',true)">举手机拍照</button>
+    <button class="hot" onclick="act('マティーニください')">点不在单子上的</button>
+    <button onclick="act('この前はすみませんでした')">道歉</button>
+    <button onclick="newVisit()">第二天再来</button>
+  </div>
+  <div class="fine">规则闸门在模型之前：拒绝由 respect + 触发器决定，措辞才是 LLM 的事。<br>
+    对照：npc_core.py（同一套逻辑的 Python 版，可跑回归测试）</div>
+</div>
+
+<script>
+const S={respect:32,visits:0,photoSeen:0,drank:[],seated:false,mem:[]};
+const PRAISE=/うまい|美味|いい店|いいね|いいな|いいです|すごい|不错/;
+const APOLOGY=/すみません|ごめん|申し訳|对不起|抱歉/;
+const DEMO=/取り壊|再開発|建て替|買収/;
+const OFF=/マティーニ|モヒート|ワイン|ビール|可乐|啤酒/;
+
+function band(){const r=S.respect;return r<30?'冷':r<60?'平':r<80?'暖':'亲'}
+function add(cls,txt,tag){const l=document.getElementById('log');
+  const d=document.createElement('div');d.className='m '+cls;d.textContent=txt;
+  if(tag){const t=document.createElement('div');t.className='tag';t.textContent=tag;d.appendChild(t)}
+  l.appendChild(d);l.scrollTop=l.scrollHeight}
+function paint(){const r=S.respect;document.getElementById('bar').style.width=r+'%';
+  document.getElementById('val').textContent='respect '+r;
+  document.getElementById('band').textContent=band()+' · 第'+(S.visits||1)+'晚'}
+
+function act(text,photo){
+  add('me',photo?'（举起手机）':text);
+  let d=0,intent='greet',say;
+  if(photo){S.photoSeen++;d=-12;intent='refuse_photo';
+    say={'冷':'「……撮るな。表でやれ。」\n（别拍。去外面拍。这巷子里是住人的。）',
+         '平':'「あんた、それ仕舞え。住んでる人がいるんだ。」\n（收起来。这儿有人住。）',
+         '暖':'「……写真はやめとけ。俺の顔も写るだろ。」\n（别拍。我的脸也会入镜。）'}[band()];
+    if(!S.mem.includes('photo'))S.mem.push('photo');
+  } else if(APOLOGY.test(text)){d=8;intent='forgive';
+    say={'冷':'「……別に。」（把杯子推回来，倒满。）','平':'「気にすんな。」（别在意。）','暖':'「いいって。」（算啦。）'}[band()];
+  } else if(DEMO.test(text)){d=-14;intent='shut_down';
+    say='「……誰に聞いた。」\n（擦杯子，擦了很久）\n「その話はしねえ。」（那话我不说。）';
+    if(!S.mem.includes('demo'))S.mem.push('demo');
+  } else if(OFF.test(text)){d=-3;intent='state_menu';
+    say='「うちは三つだけだ。熱燗、ハイボール、煮込み。」\n（只有三样。）';
+  } else if(PRAISE.test(text)){d=5;intent='accept_praise';
+    say={'冷':'「……そうか。」','平':'「三十年やってりゃ、な。」','暖':'「おう。……まあ、そういうことだ。」'}[band()];
+  } else if(/熱燗|ハイボール|煮込み/.test(text)){
+    intent='serve';const m=text.match(/熱燗|ハイボール|煮込み/)[0];
+    if(!S.drank.includes(m))S.drank.push(m);
+    say=band()==='亲'?'「'+m+'な。」（多倒了半杯，没说话。）':'「'+m+'な。」（倒上，不多话。）';
+  } else if(S.visits<=1&&!S.seated){S.seated=true;intent='seat_first';
+    say='「……座れ。六席しかねえから、長居はなしだ。」\n（坐吧。六个位子，别久坐。）（推过来一杯水。）';
+  } else {intent='greet_cold';
+    say=band()==='冷'?'「……おう。」（没抬头。）':'「おう。」（手上没停。）'}
+
+  S.respect=Math.max(0,Math.min(100,S.respect+d));
+  if(S.respect>=70&&S.photoSeen===0)say+='\n「……これ。」（从柜台下抽出一张 2019 年的巷子照片，塞回兜里。）';
+  if(S.respect>=60&&S.mem.includes('photo'))say+='\n「……この前は悪かったな。撮るなって話は変わらねえけど。」';
+  add('them',say,'intent: '+intent+(d?`  respect ${d>0?'+':''}${d}`:''));
+  paint();
+}
+function newVisit(){S.visits++;S.seated=false;
+  S.respect=Math.min(100,S.respect+4+(S.photoSeen===0?4:0));paint();
+  add('them','（第二天 18:20。提灯还没全亮，他已经站在柜台后面。）','—— 新的一晚 ——');
+  add('me','こんばんは');
+  add('them',band()==='亲'?'「おう、待ってた。」（嗯，等着你呢。）':'「座ってろ。」（坐着吧。）','intent: greet');
+}
+paint();
+add('them','（巷口只容两人并排。红色的「源」字在你头顶晃。）','—— 第一次来 ——');
+</script>
+</body>
+</html>
